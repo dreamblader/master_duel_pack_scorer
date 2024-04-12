@@ -1,0 +1,3 @@
+import scrapper
+
+scrapper.init()
