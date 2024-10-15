@@ -3,16 +3,13 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
+
 import logging
 import web_elements
 import var
 
+from models.secret_banner_data import SecretBannerData
 
-#brave_path = "/home/gm3/.local/share/flatpak/exports/bin/com.brave.Browser"
-#"/home/gm3/.local/share/flatpak/app/com.brave.Browser/x86_64/stable/8796334fbb4a98f635fadc617d67fe389c86dec73d16f839eeb7f29bb792d14c"
-
-
-ygo_pro_api = "https://db.ygoprodeck.com/api/v7/cardinfo.php?name=Dark Magician"
 
 class Scrapper():
 
@@ -27,9 +24,18 @@ class Scrapper():
     
     
     def get_secret_packs_source(self) -> str:
-        self.driver.get(web_elements.master_duel_meta_url+web_elements.secret_pack_endpoint)
+        url = web_elements.master_duel_meta_url+web_elements.secret_pack_endpoint
+        logging.info(f"Entering URL: {url}")
+        self.driver.get(url)
         logging.info("Loading Master Duel Meta Secret Packs Page...")
         self.load_all_page()
+        return self.driver.page_source
+    
+
+    def get_detailed_secret_pack_source(self, banner_link:str) -> str:
+        url = web_elements.master_duel_meta_url+banner_link
+        logging.info(f"Entering URL: {url}")
+        self.driver.get(url)
         return self.driver.page_source
 
 
@@ -47,7 +53,7 @@ class Scrapper():
             for button in buttons:
                 if button.text == web_elements.load_button_text:
                     return button
-            raise Exception("Text \"{}\" not found in current button selection".format(web_elements.load_button_text))
+            raise Exception(f"Text \"{web_elements.load_button_text}\" not found in current button selection")
         except Exception as error:
             logging.warning("Load button not found. Check web_elements.py for any deprecated selector")
             logging.error(error)
