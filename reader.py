@@ -2,6 +2,8 @@ from models.secret_banner_data import SecretBannerData
 from models.secret_pack_data import SecretPackData
 from models.card_data import CardData
 from bs4 import BeautifulSoup
+from fetcher import Fetcher
+from scrapper import Scrapper
 import logging
 import datetime
 
@@ -22,9 +24,25 @@ def get_banners(html_source:str) -> list[SecretBannerData]:
     return banner_list
 
 
-def get_secret_pack(html_source:str, banner:SecretBannerData) -> SecretPackData:
+def get_secret_pack(scrapper: Scrapper, banner:SecretBannerData) -> SecretPackData:
+    fetcher = Fetcher()
+    html_source = scrapper.get_detailed_secret_pack_source(banner.link)
     secret_pack = SecretPackData(banner.name, banner.date)
     content = BeautifulSoup(html_source, 'html.parser')
+    
+    """
+    FIXME The PROBLEM IS that the HTML_SOURCE is not fully loaded yet -> Get the array of cards and pass here
+    def isCard(css):
+        return css.startswith("image-wrapper") if css else False
+
+    cards_html = content.findAll("a", class_= isCard)
+
+    with open('html-debug.txt', 'w') as f:
+        print(html_source, file=f)
+    """
+
+    
+
     cards_html = content.findAll("a", class_="image-wrapper")
 
     for card_html in cards_html:
@@ -32,14 +50,12 @@ def get_secret_pack(html_source:str, banner:SecretBannerData) -> SecretPackData:
         name = card_href.replace("/cards/", "").replace("%20", " ")
         card = CardData(name)
         logging.info(f"Adding card \"{name}\" in {secret_pack.name}")
+        fetcher.fetch_card(scrapper, card.name)
         secret_pack.add_card(card)
+        print("TEST -",card.name, card.type, card.rarity, card.tcg_date, card.ocg_date)
     
     return secret_pack
 
 
-def get_json(html_source:str):
-    pass #TODO
-
-
 def getDate(date_str:str):
-    return datetime.datetime.strptime(date_str, "Released on %B %dth, %Y")
+    return datetime.datetime.strptime(date_str, "Released on %B %dth, %Y").date()

@@ -12,24 +12,17 @@ def main():
     scrapper = Scrapper()
     banners = reader.get_banners(scrapper.get_secret_packs_source())
     secret_packs = search_banners(scrapper, banners)
-    search_cards(secret_packs)
+    print("SEC", secret_packs)
     
 
 def search_banners(scrapper: Scrapper, banners: list[SecretBannerData]) -> list[SecretPackData]:
     secret_packs = []
     for banner in banners:
-        pack = reader.get_secret_pack(scrapper.get_detailed_secret_pack_source(banner.link), banner)
+        pack: SecretPackData = reader.get_secret_pack(scrapper, banner)
+        logging.info(f"Adding {pack}")
         secret_packs.append(pack)
         break #TODO: Remove is for a singular test only
     return secret_packs
-
-
-def search_cards(scrapper: Scrapper, packs: list[SecretPackData]):
-    fetcher = Fetcher()
-    for pack in packs:
-        for card in pack.cards:
-            fetcher.fetch_card(scrapper, card.name)
-            print(card.name, card.tcg_date, card.ocg_date)
 
 
 if __name__ == "__main__":

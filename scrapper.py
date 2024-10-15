@@ -28,6 +28,12 @@ class Scrapper():
         self.driver.get(url)
         return self.driver.page_source
 
+
+    def get_api_json(self, url) -> str:
+        self.get_url(url)
+        json_wrapper:WebElement = self.driver.find_element(By.TAG_NAME, "pre")
+        return json_wrapper.text
+
     
     def get_secret_packs_source(self) -> str:
         url = web_elements.master_duel_meta_url+web_elements.secret_pack_endpoint
