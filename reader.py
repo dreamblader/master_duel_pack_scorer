@@ -37,5 +37,9 @@ def get_secret_pack(html_source:str, banner:SecretBannerData) -> SecretPackData:
     return secret_pack
 
 
+def get_json(html_source:str):
+    pass #TODO
+
+
 def getDate(date_str:str):
     return datetime.datetime.strptime(date_str, "Released on %B %dth, %Y")

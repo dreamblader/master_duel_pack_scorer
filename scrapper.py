@@ -22,11 +22,16 @@ class Scrapper():
         chrome_options.add_experimental_option("detach", True)
         return webdriver.Chrome(options=chrome_options)
     
+
+    def get_url(self, url) -> str:
+        logging.info(f"Entering URL: {url}")
+        self.driver.get(url)
+        return self.driver.page_source
+
     
     def get_secret_packs_source(self) -> str:
         url = web_elements.master_duel_meta_url+web_elements.secret_pack_endpoint
-        logging.info(f"Entering URL: {url}")
-        self.driver.get(url)
+        self.get_url(url)
         logging.info("Loading Master Duel Meta Secret Packs Page...")
         self.load_all_page()
         return self.driver.page_source
@@ -34,20 +39,18 @@ class Scrapper():
 
     def get_detailed_secret_pack_source(self, banner_link:str) -> str:
         url = web_elements.master_duel_meta_url+banner_link
-        logging.info(f"Entering URL: {url}")
-        self.driver.get(url)
-        return self.driver.page_source
+        return self.get_url(url)
 
 
     def load_all_page(self):
-       load_button = self.get_load_button()
+       load_button = self.__get_load_button()
 
        while load_button is not None:
             load_button.click()
             load_button = self.wait_load_button(load_button)
     
 
-    def get_load_button(self) -> WebElement:
+    def __get_load_button(self) -> WebElement:
         try:
             buttons = self.driver.find_elements(By.TAG_NAME, "button")
             for button in buttons:
