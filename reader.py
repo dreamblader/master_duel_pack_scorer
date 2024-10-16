@@ -26,33 +26,16 @@ def get_banners(html_source:str) -> list[SecretBannerData]:
 
 def get_secret_pack(scrapper: Scrapper, banner:SecretBannerData) -> SecretPackData:
     fetcher = Fetcher()
-    html_source = scrapper.get_detailed_secret_pack_source(banner.link)
+    cards_href = scrapper.get_detailed_secret_pack_source(banner.link)
     secret_pack = SecretPackData(banner.name, banner.date)
-    content = BeautifulSoup(html_source, 'html.parser')
-    
-    """
-    FIXME The PROBLEM IS that the HTML_SOURCE is not fully loaded yet -> Get the array of cards and pass here
-    def isCard(css):
-        return css.startswith("image-wrapper") if css else False
 
-    cards_html = content.findAll("a", class_= isCard)
-
-    with open('html-debug.txt', 'w') as f:
-        print(html_source, file=f)
-    """
-
-    
-
-    cards_html = content.findAll("a", class_="image-wrapper")
-
-    for card_html in cards_html:
-        card_href = card_html['href']
-        name = card_href.replace("/cards/", "").replace("%20", " ")
-        card = CardData(name)
+    for card_href in cards_href:
+        name = card_href.replace("https://www.masterduelmeta.com/cards/", "").replace("%20", " ")
+        card: CardData = CardData(name)
         logging.info(f"Adding card \"{name}\" in {secret_pack.name}")
-        fetcher.fetch_card(scrapper, card.name)
+        fetcher.fetch_card(scrapper, card)
         secret_pack.add_card(card)
-        print("TEST -",card.name, card.type, card.rarity, card.tcg_date, card.ocg_date)
+        print("TEST -", card.name, card.type, card.rarity, card.tcg_date, card.ocg_date)
     
     return secret_pack
 

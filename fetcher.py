@@ -43,6 +43,7 @@ class Fetcher():
         if db_data == None:
             logging.info(f"\"{card.name}\" NOT FOUND in local database")
             api_data = self.__fetch_from_api(scrapper, card.name)
+            print(api_data)
             self.fetch_count += 1
             info = api_data.misc_info[0]
             card.type = api_data.type
@@ -65,7 +66,7 @@ class Fetcher():
 
     def __fetch_from_db(self, name:str):
         logging.info(f"Fetching \"{name}\" in local database")
-        query = f"SELECT * FROM \"Cards\" WHERE NAME = {name}"
+        query = f"SELECT * FROM \"Cards\" WHERE NAME = \"{name}\""
         response = self.cursor.execute(query)
         return response.fetchone()
 
@@ -74,7 +75,7 @@ class Fetcher():
         logging.info(f"Fetching \"{name}\" from YGOPRO API")
         endpoint = web_elements.ygo_pro_api_endpoint+name
         json_str = scrapper.get_api_json(endpoint)
-        return json.load(json_str)
+        return json.loads(json_str)
 
 
     def __save_in_db(self, card:CardData):

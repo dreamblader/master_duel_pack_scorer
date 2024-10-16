@@ -25,8 +25,7 @@ class Scrapper():
 
     def get_url(self, url) -> str:
         logging.info(f"Entering URL: {url}")
-        self.driver.get(url)
-        return self.driver.page_source
+        return self.driver.get(url)
 
 
     def get_api_json(self, url) -> str:
@@ -44,8 +43,18 @@ class Scrapper():
     
 
     def get_detailed_secret_pack_source(self, banner_link:str) -> str:
+        hrefs = []
         url = web_elements.master_duel_meta_url+banner_link
-        return self.get_url(url)
+        self.get_url(url)
+        wait = WebDriverWait(self.driver, var.WEB_DELAY)
+        condition = expected_conditions.presence_of_all_elements_located((By.CLASS_NAME, "image-wrapper"))
+        elements =  wait.until(condition)
+
+        for element in elements:
+            #FIXME Elements are getting staled better to get the pagesource after all
+            hrefs.append(element.get_attribute("href"))
+        
+        return hrefs
 
 
     def load_all_page(self):
