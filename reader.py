@@ -26,11 +26,16 @@ def get_banners(html_source:str) -> list[SecretBannerData]:
 
 def get_secret_pack(scrapper: Scrapper, banner:SecretBannerData) -> SecretPackData:
     fetcher = Fetcher()
-    cards_href = scrapper.get_detailed_secret_pack_source(banner.link)
+    html_source = scrapper.get_detailed_secret_pack_source(banner.link)
     secret_pack = SecretPackData(banner.name, banner.date)
 
-    for card_href in cards_href:
-        name = card_href.replace("https://www.masterduelmeta.com/cards/", "").replace("%20", " ")
+    content = BeautifulSoup(html_source, 'html.parser')
+    cards_html = content.findAll("a", class_="image-wrapper")
+
+
+    for card_html in cards_html:
+        card_href = card_html['href']
+        name = card_href.replace("/cards/", "").replace("%20", " ").replace("%2C", ",")
         card: CardData = CardData(name)
         logging.info(f"Adding card \"{name}\" in {secret_pack.name}")
         fetcher.fetch_card(scrapper, card)

@@ -42,13 +42,13 @@ class Fetcher():
         
         if db_data == None:
             logging.info(f"\"{card.name}\" NOT FOUND in local database")
-            api_data = self.__fetch_from_api(scrapper, card.name)
-            print(api_data)
+            api_json = self.__fetch_from_api(scrapper, card.name)
+            api_data = api_json["data"][0]
             self.fetch_count += 1
-            info = api_data.misc_info[0]
-            card.type = api_data.type
-            card.rarity = info.md_rarity
-            card.set_dates(info.ocg_date, info.tcg_date)
+            info = api_data["misc_info"][0]
+            card.type = api_data["type"]
+            card.rarity = info["md_rarity"]
+            card.set_dates(info["ocg_date"], info["tcg_date"])
             self.__save_in_db(card)
         else:
             print("DB:", db_data)
@@ -79,8 +79,8 @@ class Fetcher():
 
 
     def __save_in_db(self, card:CardData):
-        logging.info(f"Saving {{card}} in Database")
+        logging.info(f"Saving [{card}] in Database")
         query = f"""INSERT OR REPLACE INTO \"Cards\" (NAME, TYPE, RARITY, TCG_DATE, OCG_DATE) 
-                VALUES ({card.name}, {card.type}, {card.rarity}, {card.tcg_date}, {card.ocg_date}); """
+                VALUES (\"{card.name}\", \"{card.type}\", \"{card.rarity}\", \"{card.tcg_date}\", \"{card.ocg_date}\"); """
         self.cursor.execute(query)
         self.connnect.commit()
