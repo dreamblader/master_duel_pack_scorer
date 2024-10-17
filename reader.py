@@ -40,7 +40,6 @@ def get_secret_pack(scrapper: Scrapper, banner:SecretBannerData) -> SecretPackDa
         logging.info(f"Adding card \"{name}\" in {secret_pack.name}")
         fetcher.fetch_card(scrapper, card)
         secret_pack.add_card(card)
-        print("TEST -", card.name, card.type, card.rarity, card.tcg_date, card.ocg_date)
     
     return secret_pack
 

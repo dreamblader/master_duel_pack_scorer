@@ -41,27 +41,31 @@ class Fetcher():
         db_data = self.__fetch_from_db(card.name)
         
         if db_data == None:
+            self.fetch_count += 1
             logging.info(f"\"{card.name}\" NOT FOUND in local database")
             api_json = self.__fetch_from_api(scrapper, card.name)
             api_data = api_json["data"][0]
-            self.fetch_count += 1
             info = api_data["misc_info"][0]
             card.type = api_data["type"]
             card.rarity = info["md_rarity"]
             card.set_dates(info["ocg_date"], info["tcg_date"])
             self.__save_in_db(card)
         else:
-            print("DB:", db_data)
+            card.type = db_data[1]
+            card.rarity = db_data[2]
+            card.set_dates(db_data[4], db_data[3])
         
         end_req = time.perf_counter()
         self.api_time_consumed += end_req - start_req
         
         if self.fetch_count == self.max_api_fetch:
             self.fetch_count = 0
+            print(f"fetch count matched with: {self.api_time_consumed} seconds")
             if self.api_time_consumed < 1:
                 logging.warning(f"Number of API fetch passed 20 and time {self.api_time_consumed} is less than 1 second...")
                 logging.warning(f"Waiting {1-self.api_time_consumed} to resume operations")
                 time.sleep(1-self.api_time_consumed)
+            self.api_time_consumed -= 1
         
 
     def __fetch_from_db(self, name:str):

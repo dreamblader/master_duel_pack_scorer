@@ -12,7 +12,6 @@ def main():
     scrapper = Scrapper()
     banners = reader.get_banners(scrapper.get_secret_packs_source())
     secret_packs = search_banners(scrapper, banners)
-    print("SEC", secret_packs)
     
 
 def search_banners(scrapper: Scrapper, banners: list[SecretBannerData]) -> list[SecretPackData]:
