@@ -24,4 +24,4 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-launch.json
+.vscode
