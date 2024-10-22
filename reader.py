@@ -41,6 +41,8 @@ def get_secret_pack(scrapper: Scrapper, banner:SecretBannerData) -> SecretPackDa
         fetcher.fetch_card(scrapper, card)
         secret_pack.add_card(card)
     
+    secret_pack.calculate_score()
+    
     return secret_pack
 
 

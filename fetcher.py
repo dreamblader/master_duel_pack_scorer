@@ -70,8 +70,9 @@ class Fetcher():
 
     def __fetch_from_db(self, name:str):
         logging.info(f"Fetching \"{name}\" in local database")
-        query = f"SELECT * FROM \"Cards\" WHERE NAME = \"{name}\""
-        response = self.cursor.execute(query)
+        query = "SELECT * FROM \"Cards\" WHERE NAME = ?"
+        params = [name]
+        response = self.cursor.execute(query, params)
         return response.fetchone()
 
 
@@ -84,7 +85,8 @@ class Fetcher():
 
     def __save_in_db(self, card:CardData):
         logging.info(f"Saving [{card}] in Database")
-        query = f"""INSERT OR REPLACE INTO \"Cards\" (NAME, TYPE, RARITY, TCG_DATE, OCG_DATE) 
-                VALUES (\"{card.name}\", \"{card.type}\", \"{card.rarity}\", \"{card.tcg_date}\", \"{card.ocg_date}\"); """
-        self.cursor.execute(query)
+        query = """INSERT OR REPLACE INTO \"Cards\" (NAME, TYPE, RARITY, TCG_DATE, OCG_DATE) 
+                VALUES (?, ?, ?, ?, ?); """
+        params = [card.name, card.type, card.rarity, card.tcg_date, card.ocg_date]
+        self.cursor.execute(query, params)
         self.connnect.commit()

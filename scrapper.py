@@ -46,7 +46,7 @@ class Scrapper():
         url = web_elements.master_duel_meta_url+banner_link
         self.get_url(url)
         wait = WebDriverWait(self.driver, var.WEB_DELAY)
-        condition = expected_conditions.visibility_of_element_located((By.CLASS_NAME, "image-wrapper"))
+        condition = expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, "a.image-wrapper"))
         wait.until(condition)
         
         return self.driver.page_source
