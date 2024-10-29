@@ -8,9 +8,6 @@ import logging
 import web_elements
 import var
 
-from models.secret_banner_data import SecretBannerData
-
-
 class Scrapper():
 
     def __init__(self):
@@ -19,7 +16,8 @@ class Scrapper():
 
     def start_webdriver(self):
         chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_experimental_option("detach", True)
+        chrome_options.add_argument("--headless=new")
+        #chrome_options.add_experimental_option("detach", True) #ONLY TO VISUALIZATION PURPOSES
         return webdriver.Chrome(options=chrome_options)
     
 
@@ -46,7 +44,7 @@ class Scrapper():
         url = web_elements.master_duel_meta_url+banner_link
         self.get_url(url)
         wait = WebDriverWait(self.driver, var.WEB_DELAY)
-        condition = expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, "a.image-wrapper"))
+        condition = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, "a.image-wrapper"))
         wait.until(condition)
         
         return self.driver.page_source

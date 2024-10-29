@@ -3,6 +3,7 @@ import json
 import time
 import logging
 import web_elements
+from datetime import date
 from scrapper import Scrapper
 from models.card_data import CardData
 
@@ -47,8 +48,12 @@ class Fetcher():
             api_data = api_json["data"][0]
             info = api_data["misc_info"][0]
             card.type = api_data["type"]
-            card.rarity = info["md_rarity"]
-            card.set_dates(info["ocg_date"], info["tcg_date"])
+            card.rarity = info.get("md_rarity", "N/A")
+            card.set_dates(info.get("ocg_date", date.today().strftime("%Y-%m-%d")),
+                            info.get("tcg_date", date.today().strftime("%Y-%m-%d")))
+            self.key_warning("md_rarity", info)
+            self.key_warning("ocg_date", info)
+            self.key_warning("tcg_date", info)
             self.__save_in_db(card)
         else:
             card.type = db_data[1]
@@ -60,13 +65,19 @@ class Fetcher():
         
         if self.fetch_count == self.max_api_fetch:
             self.fetch_count = 0
-            print(f"fetch count matched with: {self.api_time_consumed} seconds")
+            
             if self.api_time_consumed < 1:
                 logging.warning(f"Number of API fetch passed 20 and time {self.api_time_consumed} is less than 1 second...")
                 logging.warning(f"Waiting {1-self.api_time_consumed} to resume operations")
                 time.sleep(1-self.api_time_consumed)
-            self.api_time_consumed -= 1
-        
+            
+            self.api_time_consumed = 0
+
+
+    def key_warning(self, key:str, dictionay:dict):
+        if key not in dictionay.keys():
+                logging.warning(f"Value {key} not found in API. Need to check in another source and UPDATE the Database")
+
 
     def __fetch_from_db(self, name:str):
         logging.info(f"Fetching \"{name}\" in local database")
