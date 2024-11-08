@@ -93,7 +93,7 @@ class Fetcher():
 
     def __fetch_from_api(self, scrapper:Scrapper, name:str):
         logging.info(f"Fetching \"{name}\" from YGOPRO API")
-        endpoint = web_elements.ygo_pro_api_endpoint+urllib.parse.urlencode(name) 
+        endpoint = web_elements.ygo_pro_api_endpoint+urllib.parse.quote(name) 
         json_str = scrapper.get_api_json(endpoint)
         return json.loads(json_str)
 
