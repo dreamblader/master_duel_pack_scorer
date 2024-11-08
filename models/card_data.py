@@ -1,5 +1,7 @@
 import datetime
 
+ygo_start_date = datetime.date(1999, 2, 4)
+
 class CardData:
 
     def __init__(self, name) -> None:
@@ -10,6 +12,8 @@ class CardData:
     def set_dates(self, ocg, tcg) -> None:
         self.ocg_date = datetime.datetime.strptime(ocg, "%Y-%m-%d").date()
         self.tcg_date = datetime.datetime.strptime(tcg, "%Y-%m-%d").date()
+        self.ocg_score = (self.ocg_date - ygo_start_date).days
+        self.tcg_score = (self.tcg_date - ygo_start_date).days
 
     def __str__(self):
         date_format = "%d/%m/%Y"
