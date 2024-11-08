@@ -1,13 +1,15 @@
 from scrapper import Scrapper
 from models.secret_banner_data import SecretBannerData
 from models.secret_pack_data import SecretPackData
+from datetime import datetime
 import logging
 import reader
 
 
 def main():
     #Look for logging config dictconfig to enable DEBUG and disable 3rd party debug logs
-    logging.basicConfig(filename= "logs/info.log", level=logging.INFO)
+    timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+    logging.basicConfig(filename= f"logs/{timestamp}_info.log", level=logging.INFO)
     scrapper = Scrapper()
     banners = reader.get_banners(scrapper.get_secret_packs_source())
     secret_packs = search_banners(scrapper, banners)
