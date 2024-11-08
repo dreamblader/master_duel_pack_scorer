@@ -9,7 +9,10 @@ import reader
 def main():
     #Look for logging config dictconfig to enable DEBUG and disable 3rd party debug logs
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-    logging.basicConfig(filename= f"logs/{timestamp}_info.log", level=logging.INFO)
+    file_name = f"logs/{timestamp}_info.log"
+    print("Running Scorer...")
+    print(f"for more information check the generated {file_name} log file")
+    logging.basicConfig(filename= file_name, level=logging.INFO)
     scrapper = Scrapper()
     banners = reader.get_banners(scrapper.get_secret_packs_source())
     secret_packs = search_banners(scrapper, banners)
