@@ -1,9 +1,11 @@
+import urllib.parse
 from models.secret_banner_data import SecretBannerData
 from models.secret_pack_data import SecretPackData
 from models.card_data import CardData
 from bs4 import BeautifulSoup
 from fetcher import Fetcher
 from scrapper import Scrapper
+import urllib
 import logging
 import datetime
 
@@ -35,7 +37,7 @@ def get_secret_pack(scrapper: Scrapper, banner:SecretBannerData) -> SecretPackDa
 
     for card_html in cards_html:
         card_href = card_html['href']
-        name = card_href.replace("/cards/", "").replace("%20", " ").replace("%2C", ",")
+        name = urllib.parse.unquote(card_href.replace("/cards/", ""))
         card: CardData = CardData(name)
         logging.info(f"Adding card \"{name}\" in {secret_pack.name}")
         fetcher.fetch_card(scrapper, card)

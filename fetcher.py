@@ -2,7 +2,9 @@ import sqlite3
 import json
 import time
 import logging
+import urllib.parse
 import web_elements
+import urllib
 from datetime import date
 from scrapper import Scrapper
 from models.card_data import CardData
@@ -32,7 +34,9 @@ class Fetcher():
                         "TYPE" TEXT,
                         "RARITY" TEXT,
                         "TCG_DATE" TEXT,
-                        "OCG_DATE" TEXT
+                        "OCG_DATE" TEXT,
+                        "TCG_SCORE" INTEGER,
+                        "OCG_SCORE" INTEGER
                         );"""
         self.cursor.execute(create_query)
 
@@ -89,15 +93,15 @@ class Fetcher():
 
     def __fetch_from_api(self, scrapper:Scrapper, name:str):
         logging.info(f"Fetching \"{name}\" from YGOPRO API")
-        endpoint = web_elements.ygo_pro_api_endpoint+name
+        endpoint = web_elements.ygo_pro_api_endpoint+urllib.parse.urlencode(name) 
         json_str = scrapper.get_api_json(endpoint)
         return json.loads(json_str)
 
 
     def __save_in_db(self, card:CardData):
         logging.info(f"Saving [{card}] in Database")
-        query = """INSERT OR REPLACE INTO \"Cards\" (NAME, TYPE, RARITY, TCG_DATE, OCG_DATE) 
-                VALUES (?, ?, ?, ?, ?); """
-        params = [card.name, card.type, card.rarity, card.tcg_date, card.ocg_date]
+        query = """INSERT OR REPLACE INTO \"Cards\" (NAME, TYPE, RARITY, TCG_DATE, OCG_DATE, TCG_SCORE, OCG_SCORE) 
+                VALUES (?, ?, ?, ?, ?, ?, ?); """
+        params = [card.name, card.type, card.rarity, card.tcg_date, card.ocg_date, card.tcg_score, card.ocg_score]
         self.cursor.execute(query, params)
         self.connnect.commit()
