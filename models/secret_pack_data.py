@@ -24,10 +24,10 @@ class SecretPackData:
         for card in self.cards:
             self.ocg_score += card.ocg_score
             self.tcg_score += card.tcg_score
-            max_score[DateRuleSet.OCG] = max(max_score[DateRuleSet.OCG], card.ocg_score)
-            max_score[DateRuleSet.TCG] = max(max_score[DateRuleSet.TCG], card.tcg_score)
-            min_score[DateRuleSet.OCG] = min(min_score[DateRuleSet.OCG], card.ocg_score)
-            min_score[DateRuleSet.TCG] = min(min_score[DateRuleSet.TCG], card.tcg_score)
+            max_score[DateRuleSet.OCG.value] = max(max_score[DateRuleSet.OCG.value], card.ocg_score)
+            max_score[DateRuleSet.TCG.value] = max(max_score[DateRuleSet.TCG.value], card.tcg_score)
+            min_score[DateRuleSet.OCG.value] = min(min_score[DateRuleSet.OCG.value], card.ocg_score)
+            min_score[DateRuleSet.TCG.value] = min(min_score[DateRuleSet.TCG.value], card.tcg_score)
         
         for card in self.cards:
             if card.ocg_score == min_score:
