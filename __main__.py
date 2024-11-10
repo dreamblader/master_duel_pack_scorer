@@ -22,10 +22,23 @@ def main():
 
 def search_banners(scrapper: Scrapper, banners: list[SecretBannerData]) -> list[SecretPackData]:
     secret_packs = []
+    retry_list = []
+    
     for banner in banners:
-        pack: SecretPackData = reader.get_secret_pack(scrapper, banner)
-        logging.info(f"Adding {pack}")
-        secret_packs.append(pack)
+        try:
+            pack: SecretPackData = reader.get_secret_pack(scrapper, banner)
+            logging.info(f"Adding {pack}")
+            secret_packs.append(pack)
+        except Exception as error:
+            logging.warning(f"Error related to Banner[{banner.name}], sending it to retry list")
+            logging.error(f"Stacktrace: {error}")
+            retry_list.append(banner)
+    
+    
+    if len(retry_list) > 0:
+        secret_packs.extend(search_banners(scrapper, retry_list))
+    
+    
     return secret_packs
 
 
