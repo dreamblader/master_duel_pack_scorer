@@ -4,6 +4,7 @@ from models.secret_pack_data import SecretPackData
 from datetime import datetime
 import logging
 import reader
+import writer
 
 
 def main():
@@ -16,8 +17,7 @@ def main():
     scrapper = Scrapper()
     banners = reader.get_banners(scrapper.get_secret_packs_source())
     secret_packs = search_banners(scrapper, banners)
-    secret_packs.sort(key= lambda pack : (pack.date, pack.ocg_score))
-    print(secret_packs)
+    writer.generate_csv(secret_packs)
     
 
 def search_banners(scrapper: Scrapper, banners: list[SecretBannerData]) -> list[SecretPackData]:
