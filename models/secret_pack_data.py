@@ -1,5 +1,5 @@
-import datetime
 from models.enums import DateRuleSet
+from models.card_data import CardData
 class SecretPackData:
 
     def __init__(self, name, date) -> None:
@@ -39,6 +39,32 @@ class SecretPackData:
             if card.tcg_score == max_score:
                 self.max_tcg_cards.append(card.name)
     
+
+    def get_unlock_cards(self) -> str:
+        ur = "Ultra Rare"
+        sr = "Super Rare"
+        return ", ".join(filter(lambda card: card.rarity == ur or card.rarity == sr, self.cards))
+
+
+    def get_max_cards_name(self, rule_set:DateRuleSet) -> str:
+        match rule_set:
+            case DateRuleSet.OCG:
+                return self.__get_names(self.max_ocg_cards)
+            case DateRuleSet.TCG:
+                return self.__get_names(self.max_tcg_cards)
+    
+
+    def get_min_cards_name(self, rule_set:DateRuleSet) -> str:
+        match rule_set:
+            case DateRuleSet.OCG:
+                return self.__get_names(self.min_ocg_cards)
+            case DateRuleSet.TCG:
+                return self.__get_names(self.min_tcg_cards)
+            
+
+    def __get_names(self, cards:list[CardData]) -> str:
+        return ", ".join(card.name for card in cards)
+
 
     def __str__(self):
         date_str = self.date.strftime("%d/%m/%Y")
