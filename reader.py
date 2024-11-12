@@ -60,4 +60,4 @@ def getDate(date_str:str):
 
 
 def clean_characters(s:str) -> str:
-    return re.sub("/“|”/g", "\"", s)
+    return re.sub("“|”", "\"", s)
