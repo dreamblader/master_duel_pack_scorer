@@ -22,8 +22,9 @@ def main():
     writer.generate_csv(secret_packs)
     end_time = start_time = time.perf_counter()
     print(f"Script finished with succes after {start_time-end_time} seconds...")
-    #TODO check card in konami DB is missing ocg dates (use konami_id from YGO PRO)... 
-    #FIXME Check why some cards are not in the api? Gigantic%20%E2%80%9CChampion%E2%80%9D%20Sargas???
+    #TODO Refactor based on the voices in my head
+    #TODO check card in konami DB is missing ocg dates (use konami_id from YGO PRO)... TEST
+    #FIXME Check why some cards are not in the api? Gigantic%20%E2%80%9CChampion%E2%80%9D%20Sargas??? %E2%80%9C -> %22 to work
     
 
 def search_banners(scrapper: Scrapper, banners: list[SecretBannerData]) -> list[SecretPackData]:
@@ -51,7 +52,5 @@ def search_banners(scrapper: Scrapper, banners: list[SecretBannerData]) -> list[
 if __name__ == "__main__":
     main()
     
-
-#Banner example:
-#INFO:root:Banner: Beloved Dolls(/articles/sets/beloved-dolls/)[19/01/2022]
-#INFO:root:Banner: Blooming in Adversity(/articles/sets/blooming-in-adversity/)[19/01/2022]
+#DB https://www.db.yugioh-card.com/yugiohdb/card_search.action?ope=2&cid=[konami_id]&request_locale=ja &request_locale=en
+#first t_row child of t_bodyclass .time child of .inside

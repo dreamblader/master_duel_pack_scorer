@@ -31,7 +31,15 @@ class Scrapper():
         json_wrapper:WebElement = self.driver.find_element(By.TAG_NAME, "pre")
         return json_wrapper.text
 
+
+    def get_missing_time_from_ygo_db(self, url)-> str:
+        self.get_url(url)
+        wait = WebDriverWait(self.driver, var.WEB_DELAY)
+        condition = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, web_elements.date_in_ygo_db))
+        wait.until(condition)
+        return self.driver.page_source
     
+
     def get_secret_packs_source(self) -> str:
         url = web_elements.master_duel_meta_url+web_elements.secret_pack_endpoint
         self.get_url(url)
@@ -44,7 +52,7 @@ class Scrapper():
         url = web_elements.master_duel_meta_url+banner_link
         self.get_url(url)
         wait = WebDriverWait(self.driver, var.WEB_DELAY)
-        condition = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, "a.image-wrapper"))
+        condition = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, web_elements.cards_in_pack_master_duel_page))
         wait.until(condition)
         
         return self.driver.page_source

@@ -5,6 +5,7 @@ from models.card_data import CardData
 from bs4 import BeautifulSoup
 from fetcher import Fetcher
 from scrapper import Scrapper
+import re
 import urllib
 import logging
 import datetime
@@ -28,6 +29,7 @@ def get_banners(html_source:str) -> list[SecretBannerData]:
 
 def get_secret_pack(scrapper: Scrapper, banner:SecretBannerData) -> SecretPackData:
     fetcher = Fetcher()
+    #TODO refactor create secretPackData outside and pass it, grab html source outside and pass it
     html_source = scrapper.get_detailed_secret_pack_source(banner.link)
     secret_pack = SecretPackData(banner.name, banner.date)
 
@@ -48,5 +50,14 @@ def get_secret_pack(scrapper: Scrapper, banner:SecretBannerData) -> SecretPackDa
     return secret_pack
 
 
+def get_date_in_konami_db(html_source:str) -> str:
+    content = BeautifulSoup(html_source, 'html.parser')
+    return content.find("div", class_="time").decode_contents()
+
+
 def getDate(date_str:str):
     return datetime.datetime.strptime(date_str, "Released on %B %dth, %Y").date()
+
+
+def clean_characters(s:str) -> str:
+    return re.sub("/“|”/g", "\"", s)

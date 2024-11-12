@@ -5,9 +5,11 @@ import logging
 import urllib.parse
 import web_elements
 import urllib
+import reader
 from datetime import date
 from scrapper import Scrapper
 from models.card_data import CardData
+from models.enums import DateRuleSet
 
 """
 YGO PRO API NOTE:
@@ -53,11 +55,10 @@ class Fetcher():
             info = api_data["misc_info"][0]
             card.type = api_data["type"]
             card.rarity = info.get("md_rarity", "N/A")
-            card.set_dates(info.get("ocg_date", date.today().strftime("%Y-%m-%d")),
-                            info.get("tcg_date", date.today().strftime("%Y-%m-%d")))
             self.key_warning("md_rarity", info)
-            self.key_warning("ocg_date", info)
-            self.key_warning("tcg_date", info)
+            ocg_date = info["ocg_date"] if self.key_warning("ocg_date", info) else self.__fetch_from_ygo_db(scrapper, info["konami_id"], DateRuleSet.OCG)
+            tcg_date = info["tcg_date"] if self.key_warning("tcg_date", info) else self.__fetch_from_ygo_db(scrapper, info["konami_id"], DateRuleSet.TCG)
+            card.set_dates(ocg_date, tcg_date)
             self.__save_in_db(card)
         else:
             card.type = db_data[1]
@@ -78,9 +79,11 @@ class Fetcher():
             self.api_time_consumed = 0
 
 
-    def key_warning(self, key:str, dictionay:dict):
+    def key_warning(self, key:str, dictionay:dict) -> bool:
         if key not in dictionay.keys():
-                logging.warning(f"Value {key} not found in API. Need to check in another source and UPDATE the Database")
+            logging.warning(f"Value {key} not found in API. Need to check in another source and UPDATE the Database")
+            return True
+        return False
 
 
     def __fetch_from_db(self, name:str):
@@ -93,9 +96,21 @@ class Fetcher():
 
     def __fetch_from_api(self, scrapper:Scrapper, name:str):
         logging.info(f"Fetching \"{name}\" from YGOPRO API")
-        endpoint = web_elements.ygo_pro_api_endpoint+urllib.parse.quote(name) 
+        clean_name = reader.clean_characters(name)
+        endpoint = web_elements.ygo_pro_api_endpoint+urllib.parse.quote(clean_name) 
         json_str = scrapper.get_api_json(endpoint)
         return json.loads(json_str)
+
+
+    def __fetch_from_ygo_db(self, scrapper:Scrapper, id:str, rule_set:DateRuleSet) -> str:
+        logging.info(f"Checking YGO DB for {id} because it missed the above attribute")
+        locale = web_elements.ocg_locale if rule_set == DateRuleSet.OCG else web_elements.tcg_locale
+        endpoint = web_elements.ygo_db_endpoint+id+locale
+        try:
+            return reader.get_date_in_konami_db(scrapper.get_missing_time_from_ygo_db(endpoint))
+        except:
+            logging.warning(f"{id} not found for {rule_set} forcing Today as release date for this card")
+            return date.today().strftime("%Y-%m-%d")
 
 
     def __save_in_db(self, card:CardData):
