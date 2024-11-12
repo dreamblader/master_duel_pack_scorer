@@ -56,8 +56,8 @@ class Fetcher():
             card.type = api_data["type"]
             card.rarity = info.get("md_rarity", "N/A")
             self.key_warning("md_rarity", info)
-            ocg_date = info["ocg_date"] if self.key_warning("ocg_date", info) else self.__fetch_from_ygo_db(scrapper, info["konami_id"], DateRuleSet.OCG)
-            tcg_date = info["tcg_date"] if self.key_warning("tcg_date", info) else self.__fetch_from_ygo_db(scrapper, info["konami_id"], DateRuleSet.TCG)
+            ocg_date = self.__fetch_from_ygo_db(scrapper, info["konami_id"], DateRuleSet.OCG) if self.key_warning("ocg_date", info) else info["ocg_date"]
+            tcg_date = self.__fetch_from_ygo_db(scrapper, info["konami_id"], DateRuleSet.TCG) if self.key_warning("tcg_date", info) else info["tcg_date"]
             card.set_dates(ocg_date, tcg_date)
             self.__save_in_db(card)
         else:
