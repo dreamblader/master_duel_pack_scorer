@@ -52,7 +52,7 @@ def get_secret_pack(scrapper: Scrapper, banner:SecretBannerData) -> SecretPackDa
 
 def get_date_in_konami_db(html_source:str) -> str:
     content = BeautifulSoup(html_source, 'html.parser')
-    return content.find("div", class_="time").decode_contents()
+    return content.find("div", class_="time").decode_contents().strip()
 
 
 def getDate(date_str:str):

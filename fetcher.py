@@ -105,7 +105,7 @@ class Fetcher():
     def __fetch_from_ygo_db(self, scrapper:Scrapper, id:str, rule_set:DateRuleSet) -> str:
         logging.info(f"Checking YGO DB for {id} because it missed the above attribute")
         locale = web_elements.ocg_locale if rule_set == DateRuleSet.OCG else web_elements.tcg_locale
-        endpoint = web_elements.ygo_db_endpoint+id+locale
+        endpoint = web_elements.ygo_db_endpoint+str(id)+locale
         try:
             return reader.get_date_in_konami_db(scrapper.get_missing_time_from_ygo_db(endpoint))
         except:
