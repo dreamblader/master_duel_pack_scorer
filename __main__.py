@@ -2,6 +2,7 @@ from scrapper import Scrapper
 from models.secret_banner_data import SecretBannerData
 from models.secret_pack_data import SecretPackData
 from datetime import datetime
+import sys
 import time
 import logging
 import reader
@@ -36,10 +37,14 @@ def search_banners(scrapper: Scrapper, banners: list[SecretBannerData]) -> list[
             pack: SecretPackData = reader.get_secret_pack(scrapper, banner)
             logging.info(f"Adding {pack}")
             secret_packs.append(pack)
+        except KeyboardInterrupt:
+            #TODO MOVE THIS TO ABOVE AFTER BIG REFACTOR
+            sys.exit()
         except:
             logging.warning(f"Error related to Banner[{banner.name}], sending it to retry list")
             logging.exception("Stacktrace:")
             retry_list.append(banner)
+        
     
     
     if len(retry_list) > 0:
