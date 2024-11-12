@@ -24,8 +24,6 @@ def main():
     end_time = start_time = time.perf_counter()
     print(f"Script finished with succes after {start_time-end_time} seconds...")
     #TODO Refactor based on the voices in my head
-    #TODO check card in konami DB is missing ocg dates (use konami_id from YGO PRO)... TEST
-    #FIXME Check why some cards are not in the api? Gigantic%20%E2%80%9CChampion%E2%80%9D%20Sargas??? %E2%80%9C -> %22 to work
     
 
 def search_banners(scrapper: Scrapper, banners: list[SecretBannerData]) -> list[SecretPackData]:

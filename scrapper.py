@@ -59,11 +59,15 @@ class Scrapper():
 
 
     def load_all_page(self):
-       load_button = self.__get_load_button()
+        click_count = 0
+        load_button = self.__get_load_button()
 
-       while load_button is not None:
+        while load_button is not None:
             load_button.click()
+            click_count+= 1
             load_button = self.wait_load_button(load_button)
+            
+        logging.info(f"Finished Page Load with {click_count} load button clicks")
     
 
     def __get_load_button(self) -> WebElement:
