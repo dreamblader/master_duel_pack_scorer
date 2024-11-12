@@ -19,6 +19,7 @@ def main():
     logging.basicConfig(filename= file_name, level=logging.INFO)
     scrapper = Scrapper()
     banners = reader.get_banners(scrapper.get_secret_packs_source())
+    print(f"Pack Progress: 0/{len(banners)}")
     secret_packs = search_banners(scrapper, banners)
     writer.generate_csv(secret_packs)
     end_time = start_time = time.perf_counter()
@@ -29,12 +30,15 @@ def main():
 def search_banners(scrapper: Scrapper, banners: list[SecretBannerData]) -> list[SecretPackData]:
     secret_packs = []
     retry_list = []
+    count = 1
     
     for banner in banners:
         try:
             pack: SecretPackData = reader.get_secret_pack(scrapper, banner)
             logging.info(f"Adding {pack}")
             secret_packs.append(pack)
+            print(f"Pack Progress: {count}/{len(banners)}")
+            count+=1
         except KeyboardInterrupt:
             #TODO MOVE THIS TO ABOVE AFTER BIG REFACTOR
             sys.exit()

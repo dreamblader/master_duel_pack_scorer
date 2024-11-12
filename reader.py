@@ -41,7 +41,6 @@ def get_secret_pack(scrapper: Scrapper, banner:SecretBannerData) -> SecretPackDa
         card_href = card_html['href']
         name = urllib.parse.unquote(card_href.replace("/cards/", ""))
         card: CardData = CardData(name)
-        logging.info(f"Adding card \"{name}\" in {secret_pack.name}")
         fetcher.fetch_card(scrapper, card)
         secret_pack.add_card(card)
     

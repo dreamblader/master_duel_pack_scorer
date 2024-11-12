@@ -70,9 +70,9 @@ class Fetcher():
         
         if self.fetch_count == self.max_api_fetch:
             self.fetch_count = 0
+            logging.info(f"Number of API fetchs passed 20 request in {self.api_time_consumed} seconds...")
             
             if self.api_time_consumed < 1:
-                logging.warning(f"Number of API fetch passed 20 and time {self.api_time_consumed} is less than 1 second...")
                 logging.warning(f"Waiting {1-self.api_time_consumed} to resume operations")
                 time.sleep(1-self.api_time_consumed)
             
@@ -109,7 +109,7 @@ class Fetcher():
         try:
             return reader.get_date_in_konami_db(scrapper.get_missing_time_from_ygo_db(endpoint))
         except:
-            logging.warning(f"{id} not found for {rule_set} forcing Today as release date for this card")
+            logging.warning(f"{id} not found for {rule_set} forcing #TODAY# as release date for this card")
             return date.today().strftime("%Y-%m-%d")
 
 
