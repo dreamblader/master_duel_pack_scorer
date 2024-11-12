@@ -65,9 +65,9 @@ class Scrapper():
                 if button.text == web_elements.load_button_text:
                     return button
             raise Exception(f"Text \"{web_elements.load_button_text}\" not found in current button selection")
-        except Exception as error:
+        except:
             logging.warning("Load button not found. Check web_elements.py for any deprecated selector")
-            logging.error(error)
+            logging.exception("Stacktrace:")
 
             
 

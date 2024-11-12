@@ -2,6 +2,7 @@ from scrapper import Scrapper
 from models.secret_banner_data import SecretBannerData
 from models.secret_pack_data import SecretPackData
 from datetime import datetime
+import time
 import logging
 import reader
 import writer
@@ -9,6 +10,7 @@ import writer
 
 def main():
     #Look for logging config dictconfig to enable DEBUG and disable 3rd party debug logs
+    start_time = time.perf_counter()
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     file_name = f"logs/{timestamp}_info.log"
     print("Running Scorer...")
@@ -18,6 +20,10 @@ def main():
     banners = reader.get_banners(scrapper.get_secret_packs_source())
     secret_packs = search_banners(scrapper, banners)
     writer.generate_csv(secret_packs)
+    end_time = start_time = time.perf_counter()
+    print(f"Script finished with succes after {start_time-end_time} seconds...")
+    #TODO check card in konami DB is missing ocg dates (use konami_id from YGO PRO)... 
+    #FIXME Check why some cards are not in the api? Gigantic%20%E2%80%9CChampion%E2%80%9D%20Sargas???
     
 
 def search_banners(scrapper: Scrapper, banners: list[SecretBannerData]) -> list[SecretPackData]:
@@ -29,9 +35,9 @@ def search_banners(scrapper: Scrapper, banners: list[SecretBannerData]) -> list[
             pack: SecretPackData = reader.get_secret_pack(scrapper, banner)
             logging.info(f"Adding {pack}")
             secret_packs.append(pack)
-        except Exception as error:
+        except:
             logging.warning(f"Error related to Banner[{banner.name}], sending it to retry list")
-            logging.error(f"Stacktrace: {error}")
+            logging.exception("Stacktrace:")
             retry_list.append(banner)
     
     

@@ -14,3 +14,8 @@ WHERE NAME="Zalamander Catalyzer";
 UPDATE Cards 
 SET OCG_DATE="2022-09-10", OCG_SCORE="8619" 
 WHERE NAME="Flowerdino";
+--The%20Great%20Double%20Casted%20Caster
+--Salamandra%20with%20Chain
+--Salamandra%20Fusion
+--Flame%20Swordsrealm
+-- THERE IS A LOT NEED TO FIX THIS
