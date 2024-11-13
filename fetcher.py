@@ -56,8 +56,9 @@ class Fetcher():
             card.type = api_data["type"]
             card.rarity = info.get("md_rarity", "N/A")
             self.key_warning("md_rarity", info)
-            ocg_date = self.__fetch_from_ygo_db(scrapper, info["konami_id"], DateRuleSet.OCG) if self.key_warning("ocg_date", info) else info["ocg_date"]
-            tcg_date = self.__fetch_from_ygo_db(scrapper, info["konami_id"], DateRuleSet.TCG) if self.key_warning("tcg_date", info) else info["tcg_date"]
+            konami_id = info.get("konami_id", -1)
+            ocg_date = self.__fetch_from_ygo_db(scrapper, konami_id, DateRuleSet.OCG) if self.key_warning("ocg_date", info) else info["ocg_date"]
+            tcg_date = self.__fetch_from_ygo_db(scrapper, konami_id, DateRuleSet.TCG) if self.key_warning("tcg_date", info) else info["tcg_date"]
             card.set_dates(ocg_date, tcg_date)
             self.__save_in_db(card)
         else:
@@ -103,12 +104,15 @@ class Fetcher():
 
 
     def __fetch_from_ygo_db(self, scrapper:Scrapper, id:str, rule_set:DateRuleSet) -> str:
-        logging.info(f"Checking YGO DB for {id} because it missed the above attribute")
-        locale = web_elements.ocg_locale if rule_set == DateRuleSet.OCG else web_elements.tcg_locale
-        endpoint = web_elements.ygo_db_endpoint+str(id)+locale
         try:
+            if id == -1:
+               raise Exception("No Konami ID Found") 
+            logging.info(f"Checking YGO DB for {id} because it missed the above attribute")
+            locale = web_elements.ocg_locale if rule_set == DateRuleSet.OCG else web_elements.tcg_locale
+            endpoint = web_elements.ygo_db_endpoint+str(id)+locale
             return reader.get_date_in_konami_db(scrapper.get_missing_time_from_ygo_db(endpoint))
         except:
+            logging.exception("Exception -")
             logging.warning(f"{id} not found for {rule_set} forcing #TODAY# as release date for this card")
             return date.today().strftime("%Y-%m-%d")
 
