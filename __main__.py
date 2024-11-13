@@ -23,7 +23,7 @@ def main():
     secret_packs = search_banners(scrapper, banners)
     writer.generate_csv(secret_packs)
     end_time = start_time = time.perf_counter()
-    print(f"Script finished with succes after {start_time-end_time} seconds...")
+    print(f"Script finished with succes after {end_time-start_time} seconds...")
     #TODO Refactor based on the voices in my head
     
 
