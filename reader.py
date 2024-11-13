@@ -39,7 +39,7 @@ def get_secret_pack(scrapper: Scrapper, banner:SecretBannerData) -> SecretPackDa
 
     for card_html in cards_html:
         card_href = card_html['href']
-        name = urllib.parse.unquote(card_href.replace("/cards/", ""))
+        name = mistranslation_changer(urllib.parse.unquote(card_href.replace("/cards/", "")))
         card: CardData = CardData(name)
         fetcher.fetch_card(scrapper, card)
         secret_pack.add_card(card)
@@ -59,4 +59,15 @@ def getDate(date_str:str):
 
 
 def clean_characters(s:str) -> str:
-    return re.sub("“|”", "\"", s)
+    conversion_list = [("“|”", "\""), ("–", "-")]
+    for convert in conversion_list:
+        s = re.sub(convert[0], convert[1], s)
+    return s
+
+
+def mistranslation_changer(name: str) -> str:
+    match name:
+        case "Flametongue the Burning Blade":
+            return "Flametongue the Blazing Magical Blade"
+        case _:
+            return name
