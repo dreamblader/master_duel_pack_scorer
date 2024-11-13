@@ -43,7 +43,8 @@ class SecretPackData:
     def get_unlock_cards(self) -> str:
         ur = "Ultra Rare"
         sr = "Super Rare"
-        return ", ".join(filter(lambda card: card.rarity == ur or card.rarity == sr, self.cards))
+        unlock_cards = filter(lambda card: card.rarity == ur or card.rarity == sr, self.cards)
+        return self.__get_names(unlock_cards)
 
 
     def get_max_cards_name(self, rule_set:DateRuleSet) -> str:
