@@ -3,15 +3,12 @@ from models.secret_banner_data import SecretBannerData
 from models.secret_pack_data import SecretPackData
 from models.card_data import CardData
 from bs4 import BeautifulSoup
-from fetcher import Fetcher
-from scrapper import Scrapper
-import re
+import utils
 import urllib
 import logging
-import datetime
 
 
-def get_banners(html_source:str) -> list[SecretBannerData]:
+def html_to_SecretBannerData_list(html_source:str) -> list[SecretBannerData]:
     banner_list = []
     content = BeautifulSoup(html_source, 'html.parser')
     banners_html = content.findAll("div", class_="column is-6-desktop is-6-tablet is-12-mobile")
@@ -20,52 +17,32 @@ def get_banners(html_source:str) -> list[SecretBannerData]:
         banner_name = banner_html.find('p').decode_contents()
         banner_link = banner_html.find('a', role="button")['href']
         banner_date = banner_html.find('span', slot="customSubtitle").decode_contents()
-        banner_item = SecretBannerData(banner_name, banner_link, getDate(banner_date))
+        banner_item = SecretBannerData(banner_name, banner_link, utils.getDate(banner_date))
         logging.info(banner_item)
         banner_list.append(banner_item)
     
     return banner_list
 
 
-def get_secret_pack(scrapper: Scrapper, banner:SecretBannerData) -> SecretPackData:
-    fetcher = Fetcher()
-    #TODO refactor create secretPackData outside and pass it, grab html source outside and pass it
-    html_source = scrapper.get_detailed_secret_pack_source(banner.link)
-    secret_pack = SecretPackData(banner.name, banner.date)
-
+def html_to_cards_names(html_source:str) -> SecretPackData:
     content = BeautifulSoup(html_source, 'html.parser')
     cards_html = content.findAll("a", class_="image-wrapper")
-
+    cards_name = []
 
     for card_html in cards_html:
         card_href = card_html['href']
-        name = mistranslation_changer(urllib.parse.unquote(card_href.replace("/cards/", "")))
-        card: CardData = CardData(name)
-        fetcher.fetch_card(scrapper, card)
-        secret_pack.add_card(card)
+        name = fix_mistranslation(urllib.parse.unquote(card_href.replace("/cards/", "")))
+        cards_name.append(name)
     
-    secret_pack.calculate_score()
-    
-    return secret_pack
+    return cards_name
 
 
-def get_date_in_konami_db(html_source:str) -> str:
+def konami_db_html_to_date(html_source:str) -> str:
     content = BeautifulSoup(html_source, 'html.parser')
     return content.find("div", class_="time").decode_contents().strip()
 
 
-def getDate(date_str:str):
-    return datetime.datetime.strptime(date_str, "Released on %B %dth, %Y").date()
-
-
-def clean_characters(s:str) -> str:
-    conversion_list = [("“|”", "\""), ("–", "-")]
-    for convert in conversion_list:
-        s = re.sub(convert[0], convert[1], s)
-    return s
-
-
-def mistranslation_changer(name: str) -> str:
+def fix_mistranslation(name: str) -> str:
     match name:
         case "Flametongue the Burning Blade":
             return "Flametongue the Blazing Magical Blade"

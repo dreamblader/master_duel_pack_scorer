@@ -6,7 +6,8 @@ from selenium.webdriver.common.by import By
 
 import logging
 import web_elements
-import var
+
+WEB_DELAY = 2 #Time to wait page to load stuff - unit is i seconds
 
 class Scrapper():
 
@@ -16,7 +17,7 @@ class Scrapper():
 
     def start_webdriver(self):
         chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument("--headless=new")
+        chrome_options.add_argument("--headless=new") #Hide browser
         #chrome_options.add_experimental_option("detach", True) #ONLY TO VISUALIZATION PURPOSES
         return webdriver.Chrome(options=chrome_options)
     
@@ -34,7 +35,7 @@ class Scrapper():
 
     def get_missing_time_from_ygo_db(self, url)-> str:
         self.get_url(url)
-        wait = WebDriverWait(self.driver, var.WEB_DELAY)
+        wait = WebDriverWait(self.driver, WEB_DELAY)
         condition = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, web_elements.date_in_ygo_db))
         wait.until(condition)
         return self.driver.page_source
@@ -51,7 +52,7 @@ class Scrapper():
     def get_detailed_secret_pack_source(self, banner_link:str) -> str:
         url = web_elements.master_duel_meta_url+banner_link
         self.get_url(url)
-        wait = WebDriverWait(self.driver, var.WEB_DELAY)
+        wait = WebDriverWait(self.driver, WEB_DELAY)
         condition = expected_conditions.presence_of_element_located((By.CSS_SELECTOR, web_elements.cards_in_pack_master_duel_page))
         wait.until(condition)
         
@@ -85,7 +86,7 @@ class Scrapper():
 
     def wait_load_button(self, load_button:WebElement) -> WebElement:
         try:
-            wait = WebDriverWait(self.driver, var.WEB_DELAY)
+            wait = WebDriverWait(self.driver, WEB_DELAY)
             condition = expected_conditions.element_to_be_clickable(load_button)
             return wait.until(condition)
         except:

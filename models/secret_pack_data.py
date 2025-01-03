@@ -8,11 +8,9 @@ class SecretPackData:
         self.cards = []
         self.ocg_score = 0
         self.tcg_score = 0
-        self.max_tcg_cards = []
-        self.min_tcg_cards = []
-        self.max_ocg_cards = []
-        self.min_ocg_cards = []
-    
+        self.max_card = [None] * 2
+        self.min_card = [None] * 2
+
 
     def add_card(self, card):
         self.cards.append(card)
@@ -24,21 +22,15 @@ class SecretPackData:
         for card in self.cards:
             self.ocg_score += card.ocg_score
             self.tcg_score += card.tcg_score
-            max_score[DateRuleSet.OCG.value] = max(max_score[DateRuleSet.OCG.value], card.ocg_score)
-            max_score[DateRuleSet.TCG.value] = max(max_score[DateRuleSet.TCG.value], card.tcg_score)
-            min_score[DateRuleSet.OCG.value] = min(min_score[DateRuleSet.OCG.value], card.ocg_score)
-            min_score[DateRuleSet.TCG.value] = min(min_score[DateRuleSet.TCG.value], card.tcg_score)
-        
-        for card in self.cards:
-            if card.ocg_score == min_score:
-                self.min_ocg_cards.append(card.name)
-            if card.ocg_score == max_score:
-                self.max_ocg_cards.append(card.name)
-            if card.tcg_score == min_score:
-                self.min_ocg_cards.append(card.name)
-            if card.tcg_score == max_score:
-                self.max_tcg_cards.append(card.name)
-    
+            for rule in DateRuleSet:
+                card_score = card.ocg_score if rule == DateRuleSet.OCG else card.tcg_score
+                if(card_score >= max_score[rule.value]):
+                    max_score[rule.value] = card_score
+                    self.max_card[rule.value] = card
+                if(card_score <= min_score[rule.value]):
+                    min_score[rule.value] = card_score
+                    self.min_card[rule.value] = card
+
 
     def get_unlock_cards(self) -> str:
         ur = "Ultra Rare"
@@ -48,20 +40,12 @@ class SecretPackData:
 
 
     def get_max_cards_name(self, rule_set:DateRuleSet) -> str:
-        match rule_set:
-            case DateRuleSet.OCG:
-                return self.__get_names(self.max_ocg_cards)
-            case DateRuleSet.TCG:
-                return self.__get_names(self.max_tcg_cards)
-    
+        return self.max_card[rule_set.value].name
+
 
     def get_min_cards_name(self, rule_set:DateRuleSet) -> str:
-        match rule_set:
-            case DateRuleSet.OCG:
-                return self.__get_names(self.min_ocg_cards)
-            case DateRuleSet.TCG:
-                return self.__get_names(self.min_tcg_cards)
-            
+        return self.min_card[rule_set.value].name
+
 
     def __get_names(self, cards:list[CardData]) -> str:
         return ", ".join(card.name for card in cards)

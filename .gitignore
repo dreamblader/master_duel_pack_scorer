@@ -25,4 +25,5 @@ share/python-wheels/
 MANIFEST
 
 .vscode
+*.odg*
 logs
