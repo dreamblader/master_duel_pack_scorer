@@ -29,7 +29,7 @@ def end(start_time, code):
     time_consumed = end_time-start_time
     end_type = "succes" if code == 0 else "ERROR"
     print(f"Script finished with {end_type} after {time_consumed} seconds...")
-    logging.info(f"Run Time: {time_consumed}")
+    logging.info(f"Run Time: {time_consumed} seconds")
 
 
 
