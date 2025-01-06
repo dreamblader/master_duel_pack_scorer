@@ -18,11 +18,20 @@ def main():
         fetcher = Fetcher(scrapper)
         secret_packs = fetcher.fetch_secret_packs()
         writer.generate_csv(secret_packs)
-        end_time = time.perf_counter()
-        print(f"Script finished with succes after {end_time-start_time} seconds...")
+        end(start_time, 0)
     except Exception as e:
-        print(f"Script finished with ERROR after {end_time-start_time} seconds...")
+        end(start_time, 1)
         print(f"Error StackTrace: {e}")
+
+
+def end(start_time, code):
+    end_time = time.perf_counter()
+    time_consumed = end_time-start_time
+    end_type = "succes" if code == 0 else "ERROR"
+    print(f"Script finished with {end_type} after {time_consumed} seconds...")
+    logging.info(f"Run Time: {time_consumed}")
+
+
 
 
 if __name__ == "__main__":
