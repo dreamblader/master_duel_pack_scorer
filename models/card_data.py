@@ -8,6 +8,7 @@ class CardData:
         self.name = name
         self.type = ""
         self.rarity = ""
+        self.konami_id = -1
     
     def set_dates(self, ocg, tcg) -> None:
         self.ocg_date = datetime.datetime.strptime(ocg, "%Y-%m-%d").date()

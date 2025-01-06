@@ -7,7 +7,6 @@ import writer
 
 
 def main():
-    #Look for logging config dictconfig to enable DEBUG and disable 3rd party debug logs
     start_time = time.perf_counter()
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     file_name = f"logs/{timestamp}_info.log"
@@ -19,7 +18,7 @@ def main():
         fetcher = Fetcher(scrapper)
         secret_packs = fetcher.fetch_secret_packs()
         writer.generate_csv(secret_packs)
-        end_time = start_time = time.perf_counter()
+        end_time = time.perf_counter()
         print(f"Script finished with succes after {end_time-start_time} seconds...")
     except Exception as e:
         print(f"Script finished with ERROR after {end_time-start_time} seconds...")

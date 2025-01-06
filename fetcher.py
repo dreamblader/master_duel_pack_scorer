@@ -2,6 +2,7 @@ import sqlite3
 import json
 import time
 import logging
+from typing import Any
 import urllib.parse
 import web_elements
 import urllib
@@ -48,7 +49,7 @@ class Fetcher():
 
 
     def fetch_secret_packs(self) -> list[SecretPackData]:
-        banners = parser.html_to_SecretBannerData_list(self.scrapper.get_secrets_packs_source())
+        banners = parser.html_to_SecretBannerData_list(self.scrapper.get_secret_packs_source())
         return self.fetch_from_banners(banners)
 
 
@@ -81,9 +82,9 @@ class Fetcher():
         return secret_packs
 
 
-    def fetch_cards(self, cards:list[str]) -> list[CardData]:
+    def fetch_cards(self, card_names:list[str]) -> list[CardData]:
         cards = []
-        for card_name in cards:
+        for card_name in card_names:
             cards.append(self.fetch_card(card_name))
         return cards
 
@@ -93,25 +94,21 @@ class Fetcher():
         start_req = time.perf_counter()
         db_data = self.__fetch_from_db(card.name)
         
-        #TODO add DB_DATA and API Data to the Parser Module
+
         if db_data == None:
             self.fetch_count += 1
             logging.info(f"\"{card.name}\" NOT FOUND in local database")
             api_json = self.__fetch_from_api(card.name)
             api_data = api_json["data"][0]
-            info = api_data["misc_info"][0]
-            card.type = api_data["type"]
-            card.rarity = info.get("md_rarity", "N/A")
-            self.key_warning("md_rarity", info)
-            konami_id = info.get("konami_id", -1)
-            ocg_date = self.__fetch_from_ygo_db(konami_id, DateRuleSet.OCG) if self.key_warning("ocg_date", info) else info["ocg_date"]
-            tcg_date = self.__fetch_from_ygo_db(konami_id, DateRuleSet.TCG) if self.key_warning("tcg_date", info) else info["tcg_date"]
-            card.set_dates(ocg_date, tcg_date)
+            dates = parser.add_api_data_to_card(api_data, card)
+            for rule in DateRuleSet:
+                if dates[rule.value] == "":
+                    print(f"Missing date for {rule} in {card.name} check more info in log")
+                    dates[rule.value] = self.__fetch_from_ygo_db(card.konami_id, rule)
+            card.set_dates(dates[DateRuleSet.OCG.value], dates[DateRuleSet.TCG.value])
             self.__save_in_db(card)
         else:
-            card.type = db_data[1]
-            card.rarity = db_data[2]
-            card.set_dates(db_data[4], db_data[3])
+            parser.add_db_data_to_card(db_data, card)
         
         end_req = time.perf_counter()
         self.api_time_consumed += end_req - start_req
@@ -129,15 +126,7 @@ class Fetcher():
         return card
 
 
-    def key_warning(self, key:str, dictionay:dict) -> bool:
-        #Add a Console Print Warning to check logs for current card
-        if key not in dictionay.keys():
-            logging.warning(f"Value {key} not found in API. Need to check in another source and UPDATE the Database")
-            return True
-        return False
-
-
-    def __fetch_from_db(self, name:str):
+    def __fetch_from_db(self, name:str) -> Any:
         logging.info(f"Fetching \"{name}\" in local database")
         query = "SELECT * FROM \"Cards\" WHERE NAME = ?"
         params = [name]

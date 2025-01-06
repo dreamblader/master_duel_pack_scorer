@@ -6,10 +6,10 @@ class SecretPackData:
         self.name = name
         self.date = date
         self.cards = []
-        self.ocg_score = 0
-        self.tcg_score = 0
         self.max_card = [None] * 2
         self.min_card = [None] * 2
+        self.total_score = [0] * 2
+        self.average_score = [0] * 2
 
 
     def add_card(self, card):
@@ -20,8 +20,8 @@ class SecretPackData:
         max_score = [0] * 2
         min_score = [float("inf")] * 2
         for card in self.cards:
-            self.ocg_score += card.ocg_score
-            self.tcg_score += card.tcg_score
+            self.total_score[DateRuleSet.OCG.value] += card.ocg_score
+            self.total_score[DateRuleSet.TCG.value] += card.tcg_score
             for rule in DateRuleSet:
                 card_score = card.ocg_score if rule == DateRuleSet.OCG else card.tcg_score
                 if(card_score >= max_score[rule.value]):
@@ -30,6 +30,8 @@ class SecretPackData:
                 if(card_score <= min_score[rule.value]):
                     min_score[rule.value] = card_score
                     self.min_card[rule.value] = card
+        for rule in DateRuleSet:
+            self.average_score[rule.value] = round(self.total_score[rule.value]/len(self.cards), 2)
 
 
     def get_unlock_cards(self) -> str:
@@ -53,4 +55,6 @@ class SecretPackData:
 
     def __str__(self):
         date_str = self.date.strftime("%d/%m/%Y")
-        return f"Secret Pack: {self.name} [{date_str}] || SCORE -> ({self.ocg_score})({self.tcg_score})"
+        return f"Secret Pack: {self.name} [{date_str}] \
+              || AVERAGE SCORE -> ({self.average_score[DateRuleSet.OCG.value]}) ({self.average_score[DateRuleSet.TCG.value]}) \
+              || TOTAL SCORE -> ({self.total_score[DateRuleSet.OCG.value]}) ({self.total_score[DateRuleSet.TCG.value]})"

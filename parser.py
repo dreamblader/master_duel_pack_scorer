@@ -1,3 +1,4 @@
+from typing import Any
 import urllib.parse
 from models.secret_banner_data import SecretBannerData
 from models.secret_pack_data import SecretPackData
@@ -40,6 +41,30 @@ def html_to_cards_names(html_source:str) -> SecretPackData:
 def konami_db_html_to_date(html_source:str) -> str:
     content = BeautifulSoup(html_source, 'html.parser')
     return content.find("div", class_="time").decode_contents().strip()
+
+
+def add_api_data_to_card(api_data:dict, card:CardData) -> list[str]:
+    info = api_data["misc_info"][0]
+    card.type = api_data["type"]
+    card.rarity = info.get("md_rarity", "N/A")
+    card.konami_id = info.get("konami_id", -1)
+    key_warning("md_rarity", info)
+    ocg_date = "" if key_warning("ocg_date", info) else info["ocg_date"]
+    tcg_date = "" if key_warning("tcg_date", info) else info["tcg_date"]
+    return [ocg_date, tcg_date]
+
+
+def add_db_data_to_card(db_data: Any, card: CardData):
+    card.type = db_data[1]
+    card.rarity = db_data[2]
+    card.set_dates(db_data[4], db_data[3])
+
+
+def key_warning(key:str, dictionay:dict) -> bool:
+    if key not in dictionay.keys():
+        logging.warning(f"Value {key} not found in API. Need to check in another source and UPDATE the Database")
+        return True
+    return False
 
 
 def fix_mistranslation(name: str) -> str:

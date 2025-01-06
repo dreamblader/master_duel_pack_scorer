@@ -25,5 +25,6 @@ share/python-wheels/
 MANIFEST
 
 .vscode
-*.odg*
+*.odg
 logs
+.~lock.*
